@@ -8,10 +8,25 @@ import 'package:flame/sprite.dart';
 import 'package:flame/src/experimental/geometry/shapes/shape.dart';
 import 'package:flame/widgets.dart';
 import 'package:flame/camera.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
+import 'button_controller.dart';
 
 void main() {
-  runApp(GameWidget(game: MyGeorgeGame()));
+  WidgetsFlutterBinding.ensureInitialized();
+  Flame.device.fullScreen();
+  runApp(
+    MaterialApp(
+        home: Scaffold(
+            body: GameWidget(
+      game: MyGeorgeGame(),
+      overlayBuilderMap: {
+        'ButtonController': (BuildContext context, MyGeorgeGame game) {
+          return ButtonController(game: game);
+        }
+      },
+    ))),
+  );
 }
 
 class MyGeorgeGame extends FlameGame with TapDetector {
@@ -46,7 +61,12 @@ class MyGeorgeGame extends FlameGame with TapDetector {
       ..sprite = backgroundSprite
       ..size = backgroundSprite.originalSize;
     // add(backgroud);
+    FlameAudio.bgm.initialize();
+    FlameAudio.audioCache.load('music.mp3');
     world.add(backgroud);
+
+    overlays.add("ButtonController");
+
     final spriteSheet = SpriteSheet(
         image: await images.load('george.png'), srcSize: Vector2(48, 48));
 
@@ -72,6 +92,12 @@ class MyGeorgeGame extends FlameGame with TapDetector {
 
     // camera.followComponent(george,
     //     worldBounds: Rect.fromLTRB(0, 0, backgroud.size.x, backgroud.size.y));
+  }
+
+  @override
+  void render(Canvas canvas) {
+    // TODO: implement render
+    super.render(canvas);
   }
 
   @override
